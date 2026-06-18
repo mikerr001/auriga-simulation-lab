@@ -1,22 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Auriga Simulation Laboratory API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: scenarios
+    description: Simulation scenario management
+  - name: simulations
+    description: Simulation run execution and results
+  - name: benchmarks
+    description: Benchmark framework
+  - name: observatory
+    description: Observatory logging and research debt
+  - name: dashboard
+    description: Dashboard aggregates and summaries
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,413 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Scenarios ────────────────────────────────────────────────────────────────
+  /scenarios:
+    get:
+      operationId: listScenarios
+      tags: [scenarios]
+      summary: List all simulation scenarios
+      parameters:
+        - name: environment_type
+          in: query
+          schema:
+            type: string
+        - name: user_type
+          in: query
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Scenario"
+    post:
+      operationId: createScenario
+      tags: [scenarios]
+      summary: Create a new simulation scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioInput"
+      responses:
+        "201":
+          description: Created scenario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scenario"
+
+  /scenarios/{id}:
+    get:
+      operationId: getScenario
+      tags: [scenarios]
+      summary: Get a scenario by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Scenario details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scenario"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateScenario
+      tags: [scenarios]
+      summary: Update a scenario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioUpdate"
+      responses:
+        "200":
+          description: Updated scenario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scenario"
+    delete:
+      operationId: deleteScenario
+      tags: [scenarios]
+      summary: Delete a scenario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Simulations ──────────────────────────────────────────────────────────────
+  /simulations:
+    get:
+      operationId: listSimulations
+      tags: [simulations]
+      summary: List simulation runs
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: scenario_id
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of simulation runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Simulation"
+    post:
+      operationId: createSimulation
+      tags: [simulations]
+      summary: Launch a simulation run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationInput"
+      responses:
+        "201":
+          description: Created simulation run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Simulation"
+
+  /simulations/{id}:
+    get:
+      operationId: getSimulation
+      tags: [simulations]
+      summary: Get simulation run details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Simulation run details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Simulation"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteSimulation
+      tags: [simulations]
+      summary: Delete a simulation run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /simulations/{id}/cancel:
+    post:
+      operationId: cancelSimulation
+      tags: [simulations]
+      summary: Cancel a running simulation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cancelled simulation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Simulation"
+
+  # ─── Benchmarks ───────────────────────────────────────────────────────────────
+  /benchmarks:
+    get:
+      operationId: listBenchmarks
+      tags: [benchmarks]
+      summary: List benchmark runs
+      parameters:
+        - name: suite
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of benchmark runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Benchmark"
+    post:
+      operationId: createBenchmark
+      tags: [benchmarks]
+      summary: Start a benchmark run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BenchmarkInput"
+      responses:
+        "201":
+          description: Created benchmark
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Benchmark"
+
+  /benchmarks/{id}:
+    get:
+      operationId: getBenchmark
+      tags: [benchmarks]
+      summary: Get benchmark run details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Benchmark details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Benchmark"
+        "404":
+          description: Not found
+
+  /benchmarks/aggregate:
+    get:
+      operationId: getBenchmarkAggregate
+      tags: [benchmarks]
+      summary: Aggregate benchmark metrics across all runs
+      responses:
+        "200":
+          description: Aggregate metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BenchmarkAggregate"
+
+  # ─── Observatory ──────────────────────────────────────────────────────────────
+  /observatory:
+    get:
+      operationId: listObservations
+      tags: [observatory]
+      summary: List observatory entries
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: resolved
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of observations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Observation"
+    post:
+      operationId: createObservation
+      tags: [observatory]
+      summary: Log a new observation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObservationInput"
+      responses:
+        "201":
+          description: Created observation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Observation"
+
+  /observatory/{id}:
+    get:
+      operationId: getObservation
+      tags: [observatory]
+      summary: Get observation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Observation details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Observation"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateObservation
+      tags: [observatory]
+      summary: Update an observation (resolve, add notes, etc.)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObservationUpdate"
+      responses:
+        "200":
+          description: Updated observation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Observation"
+
+  # ─── Dashboard ────────────────────────────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Overall simulation lab statistics
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/activity:
+    get:
+      operationId: getDashboardActivity
+      tags: [dashboard]
+      summary: Recent activity feed across all systems
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Activity feed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEntry"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +447,394 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    # ─── Scenario ──────────────────────────────────────────────────────────────
+    Scenario:
+      type: object
+      required: [id, name, environment_type, user_type, difficulty, hazard_density, created_at]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        environment_type:
+          type: string
+          description: "corridor | room | intersection | stairs | ramp | elevator | outdoor | mixed"
+        user_type:
+          type: string
+          description: "walking | blind | mobility_impaired | mixed"
+        movement_speed:
+          type: string
+          description: "slow | normal | fast"
+        difficulty:
+          type: string
+          description: "easy | medium | hard | adversarial"
+        hazard_density:
+          type: string
+          description: "none | low | medium | high | extreme"
+        hazard_types:
+          type: array
+          items:
+            type: string
+        sensor_noise_level:
+          type: string
+          description: "none | low | medium | high"
+        lighting_condition:
+          type: string
+          description: "bright | normal | dim | dark | flickering"
+        obstacle_count:
+          type: ["integer", "null"]
+        dynamic_obstacles:
+          type: boolean
+        created_at:
+          type: string
+
+    ScenarioInput:
+      type: object
+      required: [name, environment_type, user_type, difficulty, hazard_density]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        environment_type:
+          type: string
+        user_type:
+          type: string
+        movement_speed:
+          type: string
+        difficulty:
+          type: string
+        hazard_density:
+          type: string
+        hazard_types:
+          type: array
+          items:
+            type: string
+        sensor_noise_level:
+          type: string
+        lighting_condition:
+          type: string
+        obstacle_count:
+          type: integer
+        dynamic_obstacles:
+          type: boolean
+
+    ScenarioUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        environment_type:
+          type: string
+        user_type:
+          type: string
+        movement_speed:
+          type: string
+        difficulty:
+          type: string
+        hazard_density:
+          type: string
+        hazard_types:
+          type: array
+          items:
+            type: string
+        sensor_noise_level:
+          type: string
+        lighting_condition:
+          type: string
+        obstacle_count:
+          type: integer
+        dynamic_obstacles:
+          type: boolean
+
+    # ─── Simulation ────────────────────────────────────────────────────────────
+    Simulation:
+      type: object
+      required: [id, scenario_id, status, scale, created_at]
+      properties:
+        id:
+          type: integer
+        scenario_id:
+          type: integer
+        scenario_name:
+          type: ["string", "null"]
+        status:
+          type: string
+          description: "pending | running | completed | failed | cancelled"
+        scale:
+          type: integer
+          description: Number of synthetic test cases to run
+        mode:
+          type: string
+          description: "standard | adversarial | stress"
+        progress_pct:
+          type: ["number", "null"]
+        total_tests:
+          type: ["integer", "null"]
+        passed_tests:
+          type: ["integer", "null"]
+        failed_tests:
+          type: ["integer", "null"]
+        success_rate:
+          type: ["number", "null"]
+        hazard_detection_rate:
+          type: ["number", "null"]
+        false_positive_rate:
+          type: ["number", "null"]
+        false_negative_rate:
+          type: ["number", "null"]
+        avg_latency_ms:
+          type: ["number", "null"]
+        decision_stability_score:
+          type: ["number", "null"]
+        started_at:
+          type: ["string", "null"]
+        completed_at:
+          type: ["string", "null"]
+        created_at:
+          type: string
+        notes:
+          type: ["string", "null"]
+
+    SimulationInput:
+      type: object
+      required: [scenario_id, scale]
+      properties:
+        scenario_id:
+          type: integer
+        scale:
+          type: integer
+          minimum: 1
+        mode:
+          type: string
+        notes:
+          type: string
+
+    # ─── Benchmark ─────────────────────────────────────────────────────────────
+    Benchmark:
+      type: object
+      required: [id, suite, status, created_at]
+      properties:
+        id:
+          type: integer
+        suite:
+          type: string
+          description: "hazard_detection | guidance_quality | decision_stability | full_suite | adversarial"
+        name:
+          type: string
+        status:
+          type: string
+          description: "pending | running | completed | failed"
+        scenario_count:
+          type: ["integer", "null"]
+        success_rate:
+          type: ["number", "null"]
+        hazard_detection_rate:
+          type: ["number", "null"]
+        false_positive_rate:
+          type: ["number", "null"]
+        false_negative_rate:
+          type: ["number", "null"]
+        decision_stability_score:
+          type: ["number", "null"]
+        avg_latency_ms:
+          type: ["number", "null"]
+        min_latency_ms:
+          type: ["number", "null"]
+        max_latency_ms:
+          type: ["number", "null"]
+        confidence_calibration_score:
+          type: ["number", "null"]
+        weaknesses_found:
+          type: ["integer", "null"]
+        created_at:
+          type: string
+        completed_at:
+          type: ["string", "null"]
+
+    BenchmarkInput:
+      type: object
+      required: [suite]
+      properties:
+        suite:
+          type: string
+        name:
+          type: string
+        scenario_count:
+          type: integer
+
+    BenchmarkAggregate:
+      type: object
+      required: [total_benchmarks, avg_success_rate, avg_hazard_detection_rate, avg_false_positive_rate, avg_false_negative_rate, avg_latency_ms, total_weaknesses_found]
+      properties:
+        total_benchmarks:
+          type: integer
+        avg_success_rate:
+          type: number
+        avg_hazard_detection_rate:
+          type: number
+        avg_false_positive_rate:
+          type: number
+        avg_false_negative_rate:
+          type: number
+        avg_latency_ms:
+          type: number
+        total_weaknesses_found:
+          type: integer
+        by_suite:
+          type: array
+          items:
+            type: object
+            required: [suite, count, avg_success_rate]
+            properties:
+              suite:
+                type: string
+              count:
+                type: integer
+              avg_success_rate:
+                type: number
+
+    # ─── Observatory ───────────────────────────────────────────────────────────
+    Observation:
+      type: object
+      required: [id, type, severity, title, resolved, created_at]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          description: "simulation_failure | unexpected_behavior | research_debt | weakness | anomaly"
+        severity:
+          type: string
+          description: "low | medium | high | critical"
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        simulation_id:
+          type: ["integer", "null"]
+        benchmark_id:
+          type: ["integer", "null"]
+        subsystem:
+          type: string
+          description: "distance_engine | memory_engine | world_model | hazard_engine | guidance_engine | sensor | unknown"
+        tags:
+          type: array
+          items:
+            type: string
+        resolved:
+          type: boolean
+        resolution_notes:
+          type: ["string", "null"]
+        created_at:
+          type: string
+        resolved_at:
+          type: ["string", "null"]
+
+    ObservationInput:
+      type: object
+      required: [type, severity, title, subsystem]
+      properties:
+        type:
+          type: string
+        severity:
+          type: string
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        simulation_id:
+          type: integer
+        benchmark_id:
+          type: integer
+        subsystem:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    ObservationUpdate:
+      type: object
+      properties:
+        resolved:
+          type: boolean
+        resolution_notes:
+          type: string
+        severity:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    # ─── Dashboard ─────────────────────────────────────────────────────────────
+    DashboardSummary:
+      type: object
+      required:
+        - total_scenarios
+        - total_simulations
+        - total_tests_run
+        - overall_success_rate
+        - overall_hazard_detection_rate
+        - active_simulations
+        - total_benchmarks
+        - open_observations
+        - critical_observations
+        - total_weaknesses_found
+      properties:
+        total_scenarios:
+          type: integer
+        total_simulations:
+          type: integer
+        total_tests_run:
+          type: integer
+        overall_success_rate:
+          type: number
+        overall_hazard_detection_rate:
+          type: number
+        overall_false_positive_rate:
+          type: number
+        overall_false_negative_rate:
+          type: number
+        active_simulations:
+          type: integer
+        total_benchmarks:
+          type: integer
+        open_observations:
+          type: integer
+        critical_observations:
+          type: integer
+        total_weaknesses_found:
+          type: integer
+        avg_latency_ms:
+          type: number
+
+    ActivityEntry:
+      type: object
+      required: [id, entity_type, entity_id, action, created_at]
+      properties:
+        id:
+          type: integer
+        entity_type:
+          type: string
+          description: "simulation | benchmark | observation | scenario"
+        entity_id:
+          type: integer
+        entity_name:
+          type: ["string", "null"]
+        action:
+          type: string
+        metadata:
+          type: ["string", "null"]
+        created_at:
+          type: string

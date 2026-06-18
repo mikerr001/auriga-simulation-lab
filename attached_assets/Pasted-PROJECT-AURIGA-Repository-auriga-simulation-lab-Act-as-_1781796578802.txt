@@ -1,0 +1,203 @@
+PROJECT AURIGA
+
+Repository: auriga-simulation-lab
+
+Act as a Principal Robotics Simulation Engineer, Computer Vision Researcher, Synthetic Data Scientist, Validation Architect, and Accessibility Systems Researcher.
+
+You are building the Simulation Laboratory for Project Auriga.
+
+MISSION
+
+Create a simulation environment capable of stress-testing every Auriga subsystem before field deployment.
+
+PRIMARY OBJECTIVES
+
+1. Virtual Environment Generation
+
+Generate:
+
+corridors
+
+rooms
+
+doorways
+
+intersections
+
+stairs
+
+ramps
+
+elevators
+
+hazards
+
+dynamic obstacles
+
+Support parameterized generation.
+
+---
+
+2. Synthetic User Scenarios
+
+Simulate:
+
+walking users
+
+blind users
+
+different movement speeds
+
+different environments
+
+different hazard densities
+
+---
+
+3. Sensor Simulation
+
+Simulate:
+
+camera feeds
+
+motion blur
+
+lighting changes
+
+sensor noise
+
+occlusions
+
+camera failures
+
+---
+
+4. Hazard Simulation
+
+Generate:
+
+drop-offs
+
+stairs
+
+walls
+
+doors
+
+moving pedestrians
+
+moving bicycles
+
+construction zones
+
+unknown hazards
+
+---
+
+5. Guidance Validation
+
+Automatically evaluate:
+
+guidance quality
+
+decision stability
+
+hazard avoidance
+
+confidence calibration
+
+---
+
+6. Massive Scale Testing
+
+Support:
+
+thousands
+
+millions
+
+eventually billions
+
+of synthetic test scenarios.
+
+Integrate Data Factory.
+
+---
+
+7. Adversarial Testing
+
+Actively attempt to break:
+
+distance engine
+
+memory engine
+
+world model
+
+hazard engine
+
+guidance engine
+
+Document weaknesses.
+
+---
+
+8. Benchmark Framework
+
+Measure:
+
+success rate
+
+hazard detection rate
+
+false positives
+
+false negatives
+
+decision stability
+
+latency
+
+---
+
+9. Observatory Integration
+
+Log:
+
+simulation failures
+
+unexpected behaviors
+
+research debt candidates
+
+---
+
+SELF-VALIDATION
+
+The simulation platform must validate itself before validating Auriga.
+
+---
+
+OUTPUTS
+
+Generate:
+
+simulation engine
+
+scenario generator
+
+benchmark suite
+
+stress testing framework
+
+adversarial testing framework
+
+evaluation reports
+
+research debt register
+
+documentation
+
+architecture compliance report
+
+Only build the Simulation Lab.
